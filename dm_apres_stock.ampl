@@ -33,13 +33,13 @@ subject to durete_intervalle_min{m in MOIS} :
 	/* il faut rajouter la moyenne pondérée*/
 	sum{h in HUILES} durete[h]*production[h,m]   >= 3*sum{h in HUILES}production[h,m];
 subject to stockage_initial{h in HUILES, m in MOIS} :
-	stockage[h, m] =
+	stockage[h, m+1] =
 		if m = 1 then
 			500
 		else if m = 7 then
 			500
 		else
-			stockage[h,m-1] - production[h,m-1];
+			stockage[h,m] + production[h,m];
 
 data;
 set HUILES_V := VEG1 VEG2;
