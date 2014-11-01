@@ -9,7 +9,7 @@ param prod_max_v 		>= 0;
 param prod_max_a 		>= 0;
 param durete{HUILES} 		>= 0;
 param cout_stockage          	>= 0;
-var stockage{HUILES, 1 .. N+1} 	>= 0;
+var stockage{HUILES, 1 .. N} 	>= 0;
 var production{HUILES, MOIS} 	>= 0;
 
 maximize vente_nourriture :
@@ -36,7 +36,8 @@ subject to stockage_initial{h in HUILES, m in MOIS} :
 	stockage[h, m] =
 		if m = 1 then
 			500
-		else if m = 7 then
+		else 
+		if m = 6 then
 			500
 		else
 			stockage[h,m-1] + production[h,m-1];
