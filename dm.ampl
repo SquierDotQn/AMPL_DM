@@ -8,33 +8,30 @@ param prix_vente 		>= 0;
 param prod_max_v 		>= 0;
 param prod_max_a 		>= 0;
 param durete{HUILES} 		>= 0;
-param cout_stockage          	>= 0;
-var stockage{HUILES, 1..N+1}   	>= 0;
 var production{HUILES, MOIS} 	>= 0;
 
+/* Le profit est la différence entre la somme de tous les mois du chiffre d'affaire et celle des dépenses */
 maximize vente_nourriture :
 	sum{h in HUILES, m in MOIS} prix_vente * production[h,m]
-	- sum{h in HUILES, m in MOIS} cout_achat[h,m] * production[h,m]
-	- sum{h in HUILES, m in MOIS} cout_stockage   * stockage[h,m];
-/* On ne peut pas produire plus de 200 tonnes d'huile végétale */
+	- sum{h in HUILES, m in MOIS} cout_achat[h,m] * production[h,m];
+	
+/* On ne peut pas produire plus de prod_max_v(200) tonnes d'huile végétale */
 subject to production_max_v{m in MOIS} :
 	sum{h in HUILES_V} production[h,m] <= prod_max_v;
-/* On ne peut pas produire plus de 250 tonnes d'huile animale  */
+	
+/* On ne peut pas produire plus de prod_max_a(250) tonnes d'huile animale  */
 subject to production_max_a{m in MOIS} :
 	sum{h in HUILES_A} production[h,m] <= prod_max_a;
-/* La durete de l'huile doit être comprise entre 3 et 6*/
+	
+/* La dureté de la nourriture produite avec toutes les huiles utilisées doit être comprise entre 3 et 6, 
+   mais encadrer la dureté en fait une contrainte non-linéaire, ainsi que de la diviser par une variable
+   donc on sépare l'intervalle, et on factorise la contrainte pour la rendre linéaire */
 subject to durete_intervalle_max{m in MOIS} :
 	/* il faut rajouter la moyenne pondérée*/
 	sum{h in HUILES} durete[h]*production[h,m]   <= 6*sum{h in HUILES}production[h,m];
 subject to durete_intervalle_min{m in MOIS} :
 	/* il faut rajouter la moyenne pondérée*/
 	sum{h in HUILES} durete[h]*production[h,m]   >= 3*sum{h in HUILES}production[h,m];
-subject to stockage_initial{h in HUILES, m in MOIS} :
-	stockage[h, m] =
-		if m = 1 then
-			500
-		else if m = 6 then
-			500;
 
 data;
 set HUILES_V := VEG1 VEG2;
@@ -43,7 +40,6 @@ param N = 6;
 param prod_max_v := 200;
 param prod_max_a := 250;
 param prix_vente := 150;
-param cout_stockage := 
 
 param cout_achat (tr) :
 	VEG1	VEG2	ANI1	ANI2	ANI3 :=
