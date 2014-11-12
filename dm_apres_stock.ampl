@@ -2,19 +2,24 @@ set HUILES_V;
 set HUILES_A;
 set HUILES := HUILES_V union HUILES_A;
 param N integer >= 0;
+param X integer >= 0;
 set MOIS := 1 .. N;
 param cout_achat{HUILES,MOIS} 	>= 0;
 param prix_vente 				>= 0;
 param prod_max_v 				>= 0;
 param prod_max_a 				>= 0;
 param stockage_max				>= 0;
-param durete{HUILES} 			>= 0;
-param cout_stockage          	>= 0;
-var stockage{HUILES, 0 .. N} 	integer >= 0;
-var qte_vendue{HUILES,MOIS} 	integer >= 0;
-var qte_achete{HUILES,MOIS}		integer >= 0;
+param huiles_animale_augmentation{MOIS}		>= 0;
+param huiles_vegetale_augmentation{MOIS}	>= 0;
+param durete{HUILES} 				>= 0;
+param cout_stockage          			>= 0;
+var stockage{HUILES, 0 .. N} 			integer >= 0;
+var qte_vendue{HUILES,MOIS} 			integer >= 0;
+var qte_achete{HUILES,MOIS}			integer >= 0;
 
-
+/*var achats_totaux_vegetales= sum{h in HUILES_VEGETALES, m in MOIS}(quantite_achetee[h,m] * prix_achat_huile_par_mois[h,m] * (1 + x*augmentation_huiles_vegetales[m]));
+var achats_totaux_animales= sum{h in HUILES_ANIMALES, m in MOIS} (quantite_achetee[h,m] * prix_achat_huile_par_mois[h,m] * (1 + x*augmentation_huiles_animales[m]));*/
+/* puis dans la maximisation il faut soustraire les achats totaux des différentes huiles */
 /* Le profit est la différence entre la somme de tous les mois du chiffre d'affaire et celle des dépenses dans les huiles achetées et dans le coût de stockage */
 maximize vente_nourriture :
 	sum{h in HUILES, m in MOIS} prix_vente * qte_vendue[h,m]
